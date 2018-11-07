@@ -1,0 +1,18 @@
+stamp
+server
+
+*.swp
+
+# Truffle
+truffle/build
+truffle/data/*
+!truffle/data/.keep
+!truffle/data/keystore
+truffle/data/keystore/*
+!truffle/data/keystore/.keep
+
+# Generated Code
+*Contract.go
+
+# Secrets
+*.secret.*

@@ -1,0 +1,15 @@
+{
+    "contract": {
+        "address": "31d945d3b3fd8ab926c8e4d3c4e3bb2a5f860635",
+        "host": "ws://127.0.0.1",
+        "port": "8546",
+        "interval": 60
+    },
+    "database": {
+        "user": "user",
+        "password": "password",
+        "name": "db",
+        "host": "localhost",
+        "port": 5432
+    }
+}
