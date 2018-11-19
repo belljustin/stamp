@@ -3,6 +3,7 @@ package merkle
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"math"
 	"strconv"
 	"strings"
@@ -54,6 +55,52 @@ func NewTree(data []string) *Tree {
 		node.parent.update()
 	}
 	return &Tree{root}
+}
+
+// Prune finds the hash and removes all nodes uneccessary for proving it
+// belongs to the merkle tree. Returns an error if the hash does not exist.
+func (mt *Tree) Prune(hash string) error {
+	n, err := mt.Root.bfs(hash)
+	if err != nil {
+		return err
+	}
+
+	prune(n)
+	return nil
+}
+
+// Prune removes all nodes in a tree that aren't neccessary for proving n
+// belongs to its merkle tree. The return value is the root of the tree.
+func prune(n *Node) *Node {
+	if n.parent == nil {
+		return n
+	}
+
+	if n == n.parent.Left {
+		n.parent.Right = nil
+	} else {
+		n.parent.Left = nil
+	}
+
+	return prune(n.parent)
+}
+
+// bfs breadth first search
+func (n *Node) bfs(hash string) (*Node, error) {
+	nodes := []*Node{n}
+	for len(nodes) > 0 {
+		node, nodes := nodes[0], nodes[1:]
+		if node.Hash == hash {
+			return node, nil
+		}
+		if node.Left != nil {
+			nodes = append(nodes, node.Left)
+		}
+		if node.Right != nil {
+			nodes = append(nodes, node.Right)
+		}
+	}
+	return nil, errors.New("The hash %s does not exist")
 }
 
 func (t *Tree) Validate() bool {

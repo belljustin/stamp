@@ -6,6 +6,7 @@ import (
 
 	"github.com/belljustin/stamp/pkg/merkle"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 )
@@ -52,14 +53,19 @@ func (dao *StampDAO) New(stampId uuid.UUID) ([]StampRequest, error) {
 	return ids, err
 }
 
+// Get a stamp with the provided id
+func (dao *StampDAO) Get(id uuid.UUID) (*Stamp, error) {
+	return getStamp(dao.db, id)
+}
+
 // AddTree transitions the stamp to the processing state and adds a merkle tree.
 func (dao *StampDAO) AddTree(id uuid.UUID, merkleTree *merkle.Tree) error {
 	return addStampTree(dao.db, id, merkleTree)
 }
 
-// MarkSent transitions the stamp to the sent state.
-func (dao *StampDAO) MarkSent(id uuid.UUID) error {
-	return updateStampState(dao.db, id, "sent")
+// MarkSent transitions the stamp to the sent state and set the txhash.
+func (dao *StampDAO) MarkSent(id uuid.UUID, txhash common.Hash) error {
+	return updateStampState(dao.db, id, txhash, "sent")
 }
 
 func newStamp(h Handle, id uuid.UUID) error {
@@ -69,6 +75,26 @@ func newStamp(h Handle, id uuid.UUID) error {
 
 	_, err := h.Exec(sqlStatement, id, "pending")
 	return err
+}
+
+func getStamp(h Handle, id uuid.UUID) (*Stamp, error) {
+	sqlStatement := `
+	SELECT id, txhash, merkletree, state FROM stamps
+	WHERE id = $1`
+
+	var s Stamp
+	var bMT []byte
+	err := h.QueryRow(sqlStatement, id).Scan(&s.Id, &s.TxHash, &bMT, &s.State)
+	if err != nil {
+		return nil, err
+	}
+
+	var mt merkle.Tree
+	if err = json.Unmarshal(bMT, &mt); err != nil {
+		return nil, err
+	}
+	s.MerkleTree = &mt
+	return &s, nil
 }
 
 func addStampTree(h Handle, id uuid.UUID, merkleTree *merkle.Tree) error {
@@ -86,12 +112,12 @@ func addStampTree(h Handle, id uuid.UUID, merkleTree *merkle.Tree) error {
 	return err
 }
 
-func updateStampState(h Handle, id uuid.UUID, newState string) error {
+func updateStampState(h Handle, id uuid.UUID, txhash common.Hash, newState string) error {
 	sqlStatement := `
 	UPDATE stamps
-	SET state = $1
-	WHERE id = $2`
+	SET state = $1, txhash = $2
+	WHERE id = $3`
 
-	_, err := h.Exec(sqlStatement, newState, id)
+	_, err := h.Exec(sqlStatement, newState, txhash.Hex(), id)
 	return err
 }

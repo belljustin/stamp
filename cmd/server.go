@@ -34,16 +34,16 @@ func init() {
 
 func main() {
 	conn := db.InitDB(config.Database)
-	stampRequestDAO := db.NewStampRequestDAO(conn)
+	stampReqDAO := db.NewStampRequestDAO(conn)
 	stampDAO := db.NewStampDAO(conn)
 
 	stamper := eth.InitStamper(config.Contract)
-	scheduledStamper := eth.NewScheduledStamper(stamper, stampRequestDAO, stampDAO)
+	scheduledStamper := eth.NewScheduledStamper(stamper, stampReqDAO, stampDAO)
 	s := scheduledStamper.Start(30 * time.Second)
 	defer func() {
 		s <- true
 	}()
 
-	server := server.NewServer(config, stampRequestDAO)
+	server := server.NewServer(config, stampReqDAO, stampDAO)
 	server.Start()
 }

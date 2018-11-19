@@ -83,12 +83,12 @@ func (s *ScheduledStamper) AddStamp() (*merkle.Tree, error) {
 	// stamper.AddStamp takes a fixed sized array
 	var stampHash [32]byte
 	copy(stampHash[:], rootHash)
-	_, err = s.stamper.AddStamp(stampHash)
+	txhash, err := s.stamper.AddStamp(stampHash)
 	if err != nil {
 		log.Fatalf("Could not submit stampId %v to blockhain: %v", stampId, err)
 	}
 
-	err = s.stampDAO.MarkSent(stampId)
+	err = s.stampDAO.MarkSent(stampId, txhash)
 	if err != nil {
 		log.Fatalf("Could not mark stampId %v as sent: %v", stampId, err)
 	}
