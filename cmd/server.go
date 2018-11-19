@@ -34,7 +34,7 @@ func init() {
 
 func main() {
 	conn := db.InitDB(config.Database)
-	stampReqDAO := db.NewStampRequestDAO(conn)
+	stampReqDAO := db.NewDocumentDAO(conn)
 	stampDAO := db.NewStampDAO(conn)
 
 	stamper := eth.InitStamper(config.Contract)

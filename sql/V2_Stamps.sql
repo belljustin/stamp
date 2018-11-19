@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS stamps (
     state       stamp_state NOT NULL DEFAULT 'pending'
 );
 
-ALTER TABLE IF EXISTS stamp_requests
+ALTER TABLE IF EXISTS documents 
     ADD COLUMN IF NOT EXISTS stampId UUID;
 
 -- rambler down

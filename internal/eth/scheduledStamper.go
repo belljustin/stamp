@@ -13,12 +13,12 @@ import (
 )
 
 type ScheduledStamper struct {
-	stamper         *stamper.Stamper
-	stampRequestDAO *db.StampRequestDAO
-	stampDAO        *db.StampDAO
+	stamper     *stamper.Stamper
+	documentDAO *db.DocumentDAO
+	stampDAO    *db.StampDAO
 }
 
-func NewScheduledStamper(s *stamper.Stamper, srDAO *db.StampRequestDAO, sDAO *db.StampDAO) *ScheduledStamper {
+func NewScheduledStamper(s *stamper.Stamper, srDAO *db.DocumentDAO, sDAO *db.StampDAO) *ScheduledStamper {
 	return &ScheduledStamper{s, srDAO, sDAO}
 }
 
@@ -46,23 +46,23 @@ func (s *ScheduledStamper) Start(d time.Duration) chan interface{} {
 
 func (s *ScheduledStamper) AddStamp() (*merkle.Tree, error) {
 	stampId := uuid.New()
-	stampRequests, err := s.stampDAO.New(stampId)
+	documents, err := s.stampDAO.New(stampId)
 	if err != nil {
 		log.Fatalf("Could not add new stamp: %v", err)
 	}
-	valHashes, invalidReqIds := validateHashes(stampRequests)
+	valHashes, invalidDocIds := validateHashes(documents)
 
-	// If there are invalid requests, fail them
-	if len(invalidReqIds) > 0 {
-		n, err := s.stampRequestDAO.FailRequests(invalidReqIds)
-		log.Printf("Failed %v requests", n)
+	// If there are invalid documents, fail them
+	if len(invalidDocIds) > 0 {
+		n, err := s.documentDAO.Fail(invalidDocIds)
+		log.Printf("Failed %v documents", n)
 		if err != nil {
-			log.Fatalf("Error: couldn't fail invalid requests: %v", err)
+			log.Fatalf("Error: couldn't fail invalid documents: %v", err)
 		}
 	}
 
-	// If none of the request ids validated, just return
-	if len(valHashes.requestIds) == 0 {
+	// If none of the document ids validated, just return
+	if len(valHashes.docIds) == 0 {
 		log.Println("No valid hashes were found")
 		return nil, nil
 	}
@@ -93,31 +93,31 @@ func (s *ScheduledStamper) AddStamp() (*merkle.Tree, error) {
 		log.Fatalf("Could not mark stampId %v as sent: %v", stampId, err)
 	}
 
-	log.Printf("Stamped %d requests", len(valHashes.requestIds))
+	log.Printf("Stamped %d documents", len(valHashes.docIds))
 	return mt, nil
 }
 
 type validatedHashes struct {
-	requestIds []uuid.UUID
-	hashes     []string
+	docIds []uuid.UUID
+	hashes []string
 }
 
-func (v *validatedHashes) add(requestId uuid.UUID, hash string) {
-	v.requestIds = append(v.requestIds, requestId)
+func (v *validatedHashes) add(documentId uuid.UUID, hash string) {
+	v.docIds = append(v.docIds, documentId)
 	v.hashes = append(v.hashes, hash)
 }
 
-func validateHashes(stampRequests []db.StampRequest) (*validatedHashes, []uuid.UUID) {
-	var invalidReqIds []uuid.UUID
+func validateHashes(documents []db.Document) (*validatedHashes, []uuid.UUID) {
+	var invalidDocIds []uuid.UUID
 	valHashes := new(validatedHashes)
-	for _, sr := range stampRequests {
-		hash, err := hex.DecodeString(sr.Hash)
+	for _, d := range documents {
+		hash, err := hex.DecodeString(d.Hash)
 		if err != nil || len(hash) > 32 {
-			log.Printf("Invalid hash for stampReqId %v", sr.Id)
-			invalidReqIds = append(invalidReqIds, sr.Id)
+			log.Printf("Invalid hash for document id %v", d.Id)
+			invalidDocIds = append(invalidDocIds, d.Id)
 		} else {
-			valHashes.add(sr.Id, sr.Hash)
+			valHashes.add(d.Id, d.Hash)
 		}
 	}
-	return valHashes, invalidReqIds
+	return valHashes, invalidDocIds
 }

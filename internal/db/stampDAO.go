@@ -26,8 +26,8 @@ type Stamp struct {
 	State      string       `json:"state"`
 }
 
-// New batches all pending stamp request into a new stamp with the provided stampId.
-func (dao *StampDAO) New(stampId uuid.UUID) ([]StampRequest, error) {
+// New stamps all pending documents with a new stampId.
+func (dao *StampDAO) New(stampId uuid.UUID) ([]Document, error) {
 	tx, err := dao.db.Begin()
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (dao *StampDAO) New(stampId uuid.UUID) ([]StampRequest, error) {
 		return nil, err
 	}
 
-	ids, err := batchStampRequests(tx, stampId, "pending", "batched")
+	ids, err := stampDocuments(tx, stampId, "pending", "batched")
 	if err != nil {
 		tx.Rollback()
 		return nil, err
