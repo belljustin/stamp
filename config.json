@@ -3,7 +3,9 @@
         "address": "f6582b851bb68b8679e36765983e32ab180127ee",
         "host": "ws://127.0.0.1",
         "port": "8546",
-        "interval": 60
+        "interval": 60,
+        "privateKey": "/Users/jbell/go/src/github.com/belljustin/stamp/truffle/data/keystore/UTC--2018-11-04T22-15-40.558698529Z--8b764be433cee171951328586e38ef2450a62def",
+        "password": "abc123"
     },
     "database": {
         "user": "user",

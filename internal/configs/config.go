@@ -2,10 +2,8 @@ package configs
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
-	"os"
 )
 
 const privKeyEnvVar = "STAMP_PRIVATE_KEY"
@@ -20,7 +18,8 @@ type ContractConfig struct {
 	Host       string `json:"host"`
 	Port       string `json:"port"`
 	Interval   int    `json:"interval"`
-	PrivateKey string
+	PrivateKey string `json:"privateKey"`
+	Password   string `json:"password"`
 }
 
 type DatabaseConfig struct {
@@ -47,13 +46,6 @@ func ParseConfig(f io.Reader) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// Lookup private key in env var
-	pk, exists := os.LookupEnv(privKeyEnvVar)
-	if !exists {
-		return nil, fmt.Errorf("%s environment variable is not set", privKeyEnvVar)
-	}
-	config.Contract.PrivateKey = pk
 
 	return config, nil
 }

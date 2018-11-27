@@ -37,25 +37,15 @@ _Note_: this will prompt for the password of the ethereum account which will bec
 
 ## Configuration
 
-### Geth
+An example configuration file can be found at `config.json`.
 
-To configure private test network with geth:
-
-1. `./truffle/scripts/initGeth.sh` to initialize with the the genesis block defined at `./truffle/genesis.json`
-    - If you have a keyfile for an existing address, place it in `truffle/data/keystore/`
-2. Run `./truffle/scripts/startGeth.sh` to start the geth node
-3. In a new terminal, run `make migrate` to compile and deploy the contract to the geth node
-    - You'll have to provide the password to the keyfile
-
-### Environment Variables
-
-- STAMP\_PRIVATE\_KEY: [hex value of the private key used for stamping]
-
-### Files
-
-- config.json
-- truffle/truffle-config.js
-- (dev|prod).secret.env
+### contract
+- address: the hex address of the contract
+- host: geth node hostname
+- port: geth node port
+- interval: period, in seconds, to submit a new stamp
+- privateKey: path to the Keystore File (UTC / JSON)
+- password: used to decrypt the keystore file
 
 ## Requirements
 - geth

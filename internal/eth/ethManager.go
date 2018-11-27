@@ -1,11 +1,12 @@
 package eth
 
 import (
+	"io"
 	"log"
+	"os"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/belljustin/stamp/internal/configs"
@@ -25,12 +26,11 @@ func (em *EthManager) Connect(rawURL string) {
 	em.conn = conn
 }
 
-func (em *EthManager) GetStamper(contractAddr string, privateKeyHex string) *stamper.Stamper {
-	pk, err := crypto.HexToECDSA(privateKeyHex)
+func (em *EthManager) GetStamper(keyin io.Reader, password, contractAddr string) *stamper.Stamper {
+	auth, err := bind.NewTransactor(keyin, password)
 	if err != nil {
-		log.Fatalf("Could not convert from hex to private key")
+		log.Fatalf("Could not decrypt private key: %v", err)
 	}
-	auth := bind.NewKeyedTransactor(pk)
 
 	stampStorage, err := stamper.NewStampStorage(common.HexToAddress(contractAddr), em.conn)
 	if err != nil {
@@ -43,5 +43,9 @@ func (em *EthManager) GetStamper(contractAddr string, privateKeyHex string) *sta
 func InitStamper(config *configs.ContractConfig) *stamper.Stamper {
 	ethManager := new(EthManager)
 	ethManager.Connect(config.RawURL())
-	return ethManager.GetStamper(config.Address, config.PrivateKey)
+	keyin, err := os.Open(config.PrivateKey)
+	if err != nil {
+		log.Fatalf("Could not read private key file: %v", config.PrivateKey)
+	}
+	return ethManager.GetStamper(keyin, config.Password, config.Address)
 }
