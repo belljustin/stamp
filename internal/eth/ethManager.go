@@ -47,5 +47,6 @@ func InitStamper(config *configs.ContractConfig) *stamper.Stamper {
 	if err != nil {
 		log.Fatalf("Could not read private key file: %v", config.PrivateKey)
 	}
+	defer keyin.Close()
 	return ethManager.GetStamper(keyin, config.Password, config.Address)
 }
