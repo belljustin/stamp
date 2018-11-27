@@ -31,9 +31,17 @@ proving the document existed _at least since_ time t.
 - perform ethereum migrations on geth network
 _Note_: this will prompt for the password of the ethereum account which will become the contract
 
-### Run `make db` to:
-- start the postgres docker container
-- apply all migrations against the database
+### Database
+Database migrations are run with rambler.
+To apply the next database migration, run `rambler -c sql/rambler.json apply`.
+To revert to the previous migration, run `rambler -c sql/rambler.json reverse`
+
+### Run
+Provided:
+- config.json is properly configured,
+- StampStorage contract is deployed, and
+- Docker is running
+launching `./scripts/run.sh` should launch the entire application
 
 ## Configuration
 
