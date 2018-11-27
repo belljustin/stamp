@@ -1,28 +1,19 @@
 pragma solidity ^0.4.21;
 
 contract StampStorage {
-    struct Stamp {
-        uint timestamp;
-        bytes32 hash;
-    }
-
-    uint stampCounter = 0;
-
     address public stamper;
-    mapping (uint => Stamp) public stamps;
+    mapping (bytes32 => uint) public stamps;
 
     constructor() public {
         stamper = msg.sender;
     }
 
-    event Stamped(uint counter, uint timestamp, bytes32 hash);
+    event Stamped(bytes32 hash, uint timestamp);
 
-    function addStamp(bytes32 hash) public returns (uint) {
+    function addStamp(bytes32 hash) public {
         if (msg.sender != stamper) return;
+        if (stamps[hash] > 0) return;
         uint timestamp = now;
-        Stamp memory stamp = Stamp(timestamp, hash);
-        stamps[stampCounter] = stamp;
-        emit Stamped(stampCounter++, timestamp, hash);
-        return stampCounter;
+        emit Stamped(hash, timestamp);
     }
 }

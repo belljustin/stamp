@@ -7,4 +7,5 @@ geth --identity "MyTestNetNode" \
     --networkid 1999 \
     --datadir $parent_path/../data \
     --ws \
-    --rpc
+    --rpc \
+    --mine

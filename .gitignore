@@ -1,5 +1,4 @@
-stamp
-server
+build/stamp
 
 *.swp
 

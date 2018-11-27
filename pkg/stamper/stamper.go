@@ -15,13 +15,6 @@ type Stamper struct {
 	auth         *bind.TransactOpts
 }
 
-// Stamp submitted on the StampStorageContract
-type Stamp struct {
-	txhash     common.Hash
-	hash       [32]byte
-	stampCount int
-}
-
 // NewStamper creates a Stamper from a reference to the
 // StampStorageContract and related authorization
 func NewStamper(ss *StampStorage, auth *bind.TransactOpts) *Stamper {
@@ -47,7 +40,7 @@ func (s *Stamper) LogStamps() {
 			log.Fatal(err)
 		case stamp := <-sink:
 			hash := hex.EncodeToString(stamp.Hash[:])
-			fmt.Printf("%v, %v, %v", stamp.Counter, stamp.Timestamp, hash)
+			fmt.Printf("%v, %v", stamp.Timestamp, hash)
 		}
 	}
 }

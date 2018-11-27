@@ -48,7 +48,7 @@ func (s *ScheduledStamper) AddStamp() (*merkle.Tree, error) {
 	stampId := uuid.New()
 	documents, err := s.stampDAO.New(stampId)
 	if err != nil {
-		log.Fatalf("Could not add new stamp: %v", err)
+		log.Panicf("Could not add new stamp: %v", err)
 	}
 	valHashes, invalidDocIds := validateHashes(documents)
 
@@ -57,7 +57,7 @@ func (s *ScheduledStamper) AddStamp() (*merkle.Tree, error) {
 		n, err := s.documentDAO.Fail(invalidDocIds)
 		log.Printf("Failed %v documents", n)
 		if err != nil {
-			log.Fatalf("Error: couldn't fail invalid documents: %v", err)
+			log.Panicf("Error: couldn't fail invalid documents: %v", err)
 		}
 	}
 
@@ -71,12 +71,12 @@ func (s *ScheduledStamper) AddStamp() (*merkle.Tree, error) {
 	mt := merkle.NewTree(valHashes.hashes)
 	rootHash, err := hex.DecodeString(mt.Root.Hash)
 	if err != nil {
-		log.Fatalf("Error: merkle tree root did not contain a valid hash")
+		log.Panicf("Error: merkle tree root did not contain a valid hash")
 	}
 
 	err = s.stampDAO.AddTree(stampId, mt)
 	if err != nil {
-		log.Fatalf("Could not add tree to db for stampId %v: %v", stampId, err)
+		log.Panicf("Could not add tree to db for stampId %v: %v", stampId, err)
 	}
 
 	// Add the stamp to the contract
@@ -85,12 +85,12 @@ func (s *ScheduledStamper) AddStamp() (*merkle.Tree, error) {
 	copy(stampHash[:], rootHash)
 	txhash, err := s.stamper.AddStamp(stampHash)
 	if err != nil {
-		log.Fatalf("Could not submit stampId %v to blockhain: %v", stampId, err)
+		log.Panicf("Could not submit stampId %v to blockhain: %v", stampId, err)
 	}
 
 	err = s.stampDAO.MarkSent(stampId, txhash)
 	if err != nil {
-		log.Fatalf("Could not mark stampId %v as sent: %v", stampId, err)
+		log.Panicf("Could not mark stampId %v as sent: %v", stampId, err)
 	}
 
 	log.Printf("Stamped %d documents", len(valHashes.docIds))
