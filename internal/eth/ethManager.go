@@ -3,7 +3,9 @@ package eth
 import (
 	"io"
 	"log"
+	"math"
 	"os"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -18,12 +20,28 @@ type EthManager struct {
 }
 
 func (em *EthManager) Connect(rawURL string) {
-	conn, err := ethclient.Dial(rawURL)
+	conn, err := exponentialBackoff(rawURL)
 	if err != nil {
 		log.Fatalf("Failed to connect to Ethereum client, %s: %v", rawURL, err)
 	}
 
 	em.conn = conn
+}
+
+func exponentialBackoff(rawURL string) (*ethclient.Client, error) {
+	conn, err := ethclient.Dial(rawURL)
+	if err == nil {
+		return conn, nil
+	}
+	for i := uint(1); i < 6; i++ {
+		d := math.Exp2(float64(i))
+		log.Printf("Could not connect to Ethereum client. Will retry in %f seconds", d)
+		time.Sleep(time.Duration(d) * time.Second)
+		if err == nil {
+			return conn, nil
+		}
+	}
+	return nil, err
 }
 
 func (em *EthManager) GetStamper(keyin io.Reader, password, contractAddr string) *stamper.Stamper {
