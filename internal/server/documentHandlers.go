@@ -23,20 +23,20 @@ type DocumentResource struct {
 	dao *db.DocumentDAO
 }
 
-// Create adds a new stamp to the database and returns the newly created id
+// Create adds a new document to the database and returns the newly created id
 func (dr DocumentResource) Create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	stampReq := db.Document{}
-	err = json.Unmarshal(body, &stampReq)
+	docReq := db.Document{}
+	err = json.Unmarshal(body, &docReq)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	id, err := dr.dao.Insert(stampReq.Hash)
+	id, err := dr.dao.Insert(docReq.Hash)
 	if err != nil {
 		fmt.Fprint(w, err)
 	}
@@ -57,19 +57,19 @@ func (dr DocumentResource) Get(w http.ResponseWriter, req *http.Request, params 
 		return
 	}
 
-	stamp, err := dr.dao.Get(id)
+	document, err := dr.dao.Get(id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(w, "Not Found", 404)
 			return
 		}
-		log.Fatalf("Error retrieving stamp %v: %v", id, err)
+		log.Fatalf("Error retrieving document%v: %v", id, err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	jStamp, err := json.Marshal(stamp)
+	jStamp, err := json.Marshal(document)
 	if err != nil {
-		log.Fatalf("Error serializing document %v: %v", stamp, err)
+		log.Fatalf("Error serializing document %v: %v", document, err)
 	}
 	w.Write(jStamp)
 }
