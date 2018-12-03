@@ -23,6 +23,27 @@ type DocumentResource struct {
 	dao *db.DocumentDAO
 }
 
+type DocumentResponse struct {
+	Id    uuid.UUID `json:"id"`
+	Hash  string    `json:"hash"`
+	State string    `json:"state"`
+	Stamp string    `json:"stamp"`
+}
+
+func buildDocumentResponse(doc *db.Document) *DocumentResponse {
+	res := &DocumentResponse{
+		doc.Id,
+		doc.Hash,
+		doc.State,
+		"",
+	}
+
+	if doc.StampId != uuid.Nil {
+		res.Stamp = stampPath + "/" + doc.StampId.String()
+	}
+	return res
+}
+
 // Create adds a new document to the database and returns the newly created id
 func (dr DocumentResource) Create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	body, err := ioutil.ReadAll(req.Body)
@@ -66,10 +87,11 @@ func (dr DocumentResource) Get(w http.ResponseWriter, req *http.Request, params 
 		log.Fatalf("Error retrieving document%v: %v", id, err)
 	}
 
+	docRes := buildDocumentResponse(document)
 	w.Header().Set("Content-Type", "application/json")
-	jStamp, err := json.Marshal(document)
+	jDocument, err := json.Marshal(docRes)
 	if err != nil {
 		log.Fatalf("Error serializing document %v: %v", document, err)
 	}
-	w.Write(jStamp)
+	w.Write(jDocument)
 }

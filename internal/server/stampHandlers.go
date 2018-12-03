@@ -13,6 +13,10 @@ import (
 	"github.com/belljustin/stamp/internal/db"
 )
 
+const (
+	stampPath = "/stamp"
+)
+
 // GetStamp gets a stamp from the database and returns the details
 func GetStamp(w http.ResponseWriter, req *http.Request, params httprouter.Params, dao *db.StampDAO) {
 	sId := params.ByName("id")
