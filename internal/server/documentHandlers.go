@@ -30,7 +30,7 @@ type DocumentResponse struct {
 	Stamp string    `json:"stamp"`
 }
 
-func buildDocumentResponse(doc *db.Document) *DocumentResponse {
+func buildDocumentResponse(doc *db.Document, host string) *DocumentResponse {
 	res := &DocumentResponse{
 		doc.Id,
 		doc.Hash,
@@ -39,7 +39,7 @@ func buildDocumentResponse(doc *db.Document) *DocumentResponse {
 	}
 
 	if doc.StampId != uuid.Nil {
-		res.Stamp = stampPath + "/" + doc.StampId.String()
+		res.Stamp = BuildStampLocation(host, doc.StampId)
 	}
 	return res
 }
@@ -87,7 +87,7 @@ func (dr DocumentResource) Get(w http.ResponseWriter, req *http.Request, params 
 		log.Fatalf("Error retrieving document%v: %v", id, err)
 	}
 
-	docRes := buildDocumentResponse(document)
+	docRes := buildDocumentResponse(document, req.Host)
 	w.Header().Set("Content-Type", "application/json")
 	jDocument, err := json.Marshal(docRes)
 	if err != nil {

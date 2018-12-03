@@ -53,3 +53,7 @@ func NewGetStampHandler(dao *db.StampDAO) httprouter.Handle {
 		GetStamp(w, req, pr, dao)
 	}
 }
+
+func BuildStampLocation(host string, id uuid.UUID) string {
+	return host + stampPath + "/" + id.String()
+}
