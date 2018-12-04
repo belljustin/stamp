@@ -12,8 +12,8 @@ To avoid broadcasting frequent and numerous document stamps - which may be prohi
 Document hashes submitted to the Stamp API are periodically batched and submitted in this way.
 
 ### Document proofs
-A subset of the tree nodes, which are sufficient to prove a valid document was included in the stamp, may be retrieved after the stamp has been broadcasted.
-This proof size is proportianal to log(n), where n is the number of documents sumbitted in the stamp.
+A subset of the tree nodes, which are sufficient to prove a valid document is included in a stamp, may be retrieved after the stamp has been mined.
+The proof's size is proportianal to log(n), where n is the number of documents submitted in the stamp.
 Others can independently and trustlessly:
 - verify this proof forms a valid merkle tree,
 - its root is stored in the StampStorage contract,
