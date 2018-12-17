@@ -60,3 +60,10 @@ An example configuration file can be found at `config.json`.
 - solc
 - truffle
 - [rambler](https://github.com/elwinar/rambler/releases/download/4.2.0/rambler-darwin-10.6-386)
+
+# API
+
+- [Ping](api.md#ping) `GET /ping`
+- [Get Document](api.md#get-document) `GET /document/{id}`
+- [Create Document](api.md#create-document) `POST /document`
+- [Get Stamp](api.md#get-stamp) `GET /stamp/{id}`
