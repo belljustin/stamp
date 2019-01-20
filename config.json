@@ -1,10 +1,10 @@
 {
     "contract": {
-        "address": "f6582b851bb68b8679e36765983e32ab180127ee",
+        "address": "22a0522ea274a0c0317404973b85a1c2dc98b2dba4bf411ebc42fec3528c1fb4",
         "host": "ws://127.0.0.1",
         "port": "8546",
         "interval": 60,
-        "privateKey": "/Users/jbell/go/src/github.com/belljustin/stamp/truffle/data/keystore/UTC--2018-11-04T22-15-40.558698529Z--8b764be433cee171951328586e38ef2450a62def",
+        "privateKey": "/Users/jbell/go/src/github.com/belljustin/stamp/ethereum/data/keystore/UTC--2019-01-20T20-34-49.747250242Z--62eb2b054733966079ed3613d3a60c89e106bd5e",
         "password": "abc123"
     },
     "database": {

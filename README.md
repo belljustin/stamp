@@ -29,7 +29,6 @@ proving the document existed _at least since_ time t.
 ### Run `make truffle` to:
 - compile all the solidity contracts
 - perform ethereum migrations on geth network
-_Note_: this will prompt for the password of the ethereum account which will become the contract
 
 ### Database
 Database migrations are run with rambler.
@@ -37,11 +36,10 @@ To apply the next database migration, run `rambler -c sql/rambler.json apply`.
 To revert to the previous migration, run `rambler -c sql/rambler.json reverse`
 
 ### Run
-Provided:
-- config.json is properly configured,
-- StampStorage contract is deployed, and
-- Docker is running
-launching `./scripts/run.sh` should launch the entire application
+```sh
+docker-compose up
+./build/stamp -config config.json
+```
 
 ## Configuration
 
